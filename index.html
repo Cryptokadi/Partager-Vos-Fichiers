@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partage de Fichiers</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #333;
+            margin-top: 20px;
+        }
+        input[type="file"], input[type="text"], button {
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        #visitorCount {
+            font-size: 1.2em;
+            color: #007BFF;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .explanation {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .explanation strong {
+            color: #d32f2f;
+        }
+        .explanation span {
+            color: #1976d2;
+        }
+        #codeDisplay {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .file-input-container {
+            margin-bottom: 20px;
+        }
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            background-color: #f4f4f9;
+            padding: 10px 0;
+            border-top: 1px solid #ddd;
+            font-size: 1.2em;
+            color: #007BFF;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Partagez Vos Fichiers</h1>
+
+        <!-- Section pour uploader un fichier -->
+        <div class="explanation">
+            <p>
+                <strong>Explication :</strong>
+                <span>Choisissez le fichier que vous souhaitez partager avec vos amis, générez un code, puis communiquez ce code à vos amis. Ils pourront l'utiliser dans la section de téléchargement pour récupérer le fichier.</span>
+            </p>
+        </div>
+        <div>
+            <h2>Envoyer un fichier</h2>
+            <div class="file-input-container">
+                <input type="file" id="fileInput" multiple>
+            </div>
+            <button onclick="uploadFile()">Générer un Code de Partage</button>
+            <p id="codeDisplay"></p>
+        </div>
+
+        <!-- Section pour télécharger un fichier -->
+        <div>
+            <h2>Télécharger un Fichier</h2>
+            <input type="text" id="codeInput" placeholder="Entrez le code de partage">
+            <button onclick="downloadFile()">Télécharger le Fichier</button>
+        </div>
+    </div>
+
+    <!-- Section pour afficher le nombre de visiteurs -->
+    <div class="footer">
+        <p>Nombre de visiteurs : <span id="visitorCount">Chargement...</span></p>
+    </div>
+
+    <script>
+        // Fonction pour récupérer et afficher le nombre de visiteurs
+        async function fetchVisitorCount() {
+            try {
+                const response = await fetch('/api/visitors');
+                const data = await response.json();
+                document.getElementById('visitorCount').textContent = data.visitors;
+            } catch (error) {
+                console.error('Erreur lors de la récupération du nombre de visiteurs :', error);
+                document.getElementById('visitorCount').textContent = 'Erreur';
+            }
+        }
+
+        // Appeler la fonction au chargement de la page
+        fetchVisitorCount();
+
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const codeDisplay = document.getElementById('codeDisplay');
+
+            if (fileInput.files.length === 0) {
+                alert('Veuillez sélectionner un fichier.');
+                return;
+            }
+
+            const formData = new FormData();
+            for (let i = 0; i < fileInput.files.length; i++) {
+                formData.append('files', fileInput.files[i]);
+            }
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erreur lors de l\'envoi du fichier');
+                }
+
+                const data = await response.json();
+                codeDisplay.textContent = `Code de partage : ${data.code}`;
+            } catch (error) {
+                console.error('Erreur :', error);
+                codeDisplay.textContent = 'Erreur lors de la génération du code.';
+            }
+        }
+
+        async function downloadFile() {
+            const codeInput = document.getElementById('codeInput');
+            const code = codeInput.value;
+
+            if (!code) {
+                alert('Veuillez entrer un code de partage.');
+                return;
+            }
+
+            window.open(`/download/${code}`, '_blank');
+        }
+    </script>
+//publicitee  
+  <script type='text/javascript' src='//pl25728689.effectiveratecpm.com/e6/01/bc/e601bc4e516c131889f0feef11d9de08.js'></script>
+  
+</body>
+</html>

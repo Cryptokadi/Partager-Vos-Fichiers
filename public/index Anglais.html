@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share Your Files</title>
+    <style>
+        /* Reset CSS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body 
+
+      {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            animation: fadeIn 0.5s ease-in-out;
+            flex: 1;
+        }
+
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            animation: slideDown 0.5s ease-in-out;
+        }
+
+        h2 {
+            color: #4CAF50;
+            margin-top: 20px;
+            font-size: 1.6em;
+            animation: slideDown 0.5s ease-in-out;
+        }
+
+        .explanation {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .explanation strong {
+            color: #d32f2f;
+        }
+
+        .explanation span {
+            color: #1976d2;
+        }
+
+        input[type="file"], input[type="text"], button {
+            margin: 10px 0;
+            padding: 12px;
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="file"] {
+            background-color: #f9f9f9;
+        }
+
+        input[type="file"]:hover {
+            border-color: #4CAF50;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        #codeDisplay {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #4CAF50;
+            font-weight: bold;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .file-input-container {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .file-input-container label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Section du nombre de visiteurs en bas de page */
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            color: white;
+            margin-top: auto;
+        }
+
+        #visitorCount {
+            font-size: 1.2em;
+            color: #007BFF; /* Bleu vif */
+            font-weight: bold;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Share Your Files Freely </h2>
+
+    <!-- Section pour uploader un fichier -->
+    <div class="explanation">
+        <p>
+            <strong>Explanation :</strong>
+            <span> Choose the file you want to share with your friends, generate a code, then share this code with your friends. They can use it in the download section to retrieve the file.</span>
+        </p>
+    </div>
+    <div>
+        <h3>Send a file</h3>
+        <div class="file-input-container">
+            <label for="fileInput"></label>
+            <input type="file" id="fileInput">
+        </div>
+        <button onclick="uploadFile()">Generate a Share Code</button>
+        <p id="codeDisplay"></p>
+    </div>
+
+    <!-- Section pour télécharger un fichier -->
+    <div>
+        <h3>Download a File</h3>
+        <input type="text" id="codeInput" placeholder="Entrez le code de partage">
+        <button onclick="downloadFile()">Download the File</button>
+    </div>
+</div>
+
+<!-- Section pour afficher le nombre de visiteurs en bas de page -->
+<footer>
+  <h2><p>Number of visitors: <span id="visitorCount">Loading...</span></p></h2>
+</footer>
+
+<script>
+    // Fonction pour récupérer et afficher le nombre de visiteurs
+    async function fetchVisitorCount() {
+        try {
+            const response = await fetch('/api/visitors');
+            const data = await response.json();
+            document.getElementById('visitorCount').textContent = data.visitors;
+        } catch (error) {
+            console.error('Erreur lors de la récupération du nombre de visiteurs :', error);
+            document.getElementById('visitorCount').textContent = 'Erreur';
+        }
+    }
+
+    // Appeler la fonction au chargement de la page
+    fetchVisitorCount();
+
+    async function uploadFile() {
+        const fileInput = document.getElementById('fileInput');
+        const codeDisplay = document.getElementById('codeDisplay');
+
+        if (fileInput.files.length === 0) {
+            alert('Veuillez sélectionner un fichier.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        try {
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error('Erreur lors de l\'envoi du fichier.');
+            }
+
+            const data = await response.json();
+            codeDisplay.textContent = `Code de partage : ${data.code}`;
+        } catch (error) {
+            console.error('Erreur :', error);
+            codeDisplay.textContent = 'Erreur lors de la génération du code.';
+        }
+    }
+
+    async function downloadFile() {
+        const codeInput = document.getElementById('codeInput');
+        const code = codeInput.value;
+
+        if (!code) {
+            alert('Veuillez entrer un code de partage.');
+            return;
+        }
+
+        window.open(`/download/${code}`, '_blank');
+    }
+</script>
+   <h3>   
+     <script type='text/javascript' src='//pl25728689.profitablecpmrate.com/e6/01/bc/e601bc4e516c131889f0feef11d9de08.js'></script>
+     
+     </h3>
+</body>
+</html>
