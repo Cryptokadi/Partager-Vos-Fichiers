@@ -5,90 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Partage de Fichiers</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
-            color: #333;
-        }
-        .container {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        h1 {
-            color: #4CAF50;
-            margin-bottom: 20px;
-        }
-        h2 {
-            color: #333;
-            margin-top: 20px;
-        }
-        input[type="file"], input[type="text"], button {
-            margin: 10px 0;
-            padding: 10px;
-            width: 100%;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        button:hover {
-            background-color: #45a049;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        #visitorCount {
-            font-size: 1.2em;
-            color: #007BFF;
-            font-weight: bold;
-            margin-top: 20px;
-        }
-        .explanation {
-            background-color: #e3f2fd;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        .explanation strong {
-            color: #d32f2f;
-        }
-        .explanation span {
-            color: #1976d2;
-        }
-        #codeDisplay {
-            margin-top: 20px;
-            font-size: 1.2em;
-            color: #4CAF50;
-            font-weight: bold;
-        }
-        .file-input-container {
-            margin-bottom: 20px;
-        }
-        .footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            background-color: #f4f4f9;
-            padding: 10px 0;
-            border-top: 1px solid #ddd;
-            font-size: 1.2em;
-            color: #007BFF;
-            font-weight: bold;
-        }
+        /* Votre CSS existant */
     </style>
 </head>
 <body>
@@ -137,8 +54,22 @@
             }
         }
 
-        // Appeler la fonction au chargement de la page
+        // Fonction pour incrémenter le compteur de visiteurs
+        async function incrementVisitorCount() {
+            try {
+                const response = await fetch('/api/increment', {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                document.getElementById('visitorCount').textContent = data.visitors;
+            } catch (error) {
+                console.error('Erreur lors de l\'incrémentation du nombre de visiteurs :', error);
+            }
+        }
+
+        // Appeler les fonctions au chargement de la page
         fetchVisitorCount();
+        incrementVisitorCount();
 
         async function uploadFile() {
             const fileInput = document.getElementById('fileInput');
@@ -184,8 +115,7 @@
             window.open(`/download/${code}`, '_blank');
         }
     </script>
-//publicitee  
-  <script type='text/javascript' src='//pl25728689.effectiveratecpm.com/e6/01/bc/e601bc4e516c131889f0feef11d9de08.js'></script>
-  
+    <!-- Publicité -->
+    <script type='text/javascript' src='//pl25728689.effectiveratecpm.com/e6/01/bc/e601bc4e516c131889f0feef11d9de08.js'></script>
 </body>
 </html>
